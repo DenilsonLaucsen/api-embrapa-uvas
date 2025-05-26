@@ -25,6 +25,14 @@ Este projeto faz parte do Tech Challenge da pós-graduação em Machine Learning
 
 ---
 
+## 📊 Architecture Diagram
+
+Below is a high-level overview of the project architecture:
+
+![Architecture Diagram](docs/architecture-diagram.png)
+
+---
+
 ## 📄 Licença
 
 Este projeto está licenciado sob os termos da licença MIT.
