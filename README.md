@@ -25,11 +25,11 @@ Este projeto faz parte do Tech Challenge da pós-graduação em Machine Learning
 
 ---
 
-## 📊 Architecture Diagram
+## 📊 Diagrama de Arquitetura
 
-Below is a high-level overview of the project architecture:
+Abaixo está uma visão geral de alto nível da arquitetura do projeto:
 
-![Architecture Diagram](docs/architecture-diagram.png)
+![Diagrama de Arquitetura](docs/architecture-diagram.png)
 
 ---
 
