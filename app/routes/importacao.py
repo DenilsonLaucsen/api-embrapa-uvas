@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Query
+from typing import Literal
+from fastapi import APIRouter, Query, Path
 from app.services.scraper import get_html_table, parse_importacao_html
 from app.services.fallback import (
     get_fallback_imp_espumantes,
@@ -8,27 +9,36 @@ from app.services.fallback import (
     get_fallback_imp_suco
 )
 from app.constants import VINHOS_DE_MESA, ESPUMANTES, UVAS_FRESCAS, UVAS_PASSAS, SUCO_DE_UVA
+from app.models.importacao import ImportacaoResponse, TipoImportacaoEnum
 
 router = APIRouter()
 
 TIPOS_IMPORTACAO = {
-    VINHOS_DE_MESA: "subopt_01",
-    ESPUMANTES: "subopt_02",
-    UVAS_FRESCAS: "subopt_03",
-    UVAS_PASSAS: "subopt_04",
-    SUCO_DE_UVA: "subopt_05"
+    TipoImportacaoEnum.VINHOS_DE_MESA: "subopt_01",
+    TipoImportacaoEnum.ESPUMANTES: "subopt_02",
+    TipoImportacaoEnum.UVAS_FRESCAS: "subopt_03",
+    TipoImportacaoEnum.UVAS_PASSAS: "subopt_04",
+    TipoImportacaoEnum.SUCO_DE_UVA: "subopt_05"
 }
 
 FALLBACK_FUNCS = {
-    VINHOS_DE_MESA: get_fallback_imp_vinhos,
-    ESPUMANTES: get_fallback_imp_espumantes,
-    UVAS_FRESCAS: get_fallback_imp_frescas,
-    UVAS_PASSAS: get_fallback_imp_passas,
-    SUCO_DE_UVA: get_fallback_imp_suco,
+    TipoImportacaoEnum.VINHOS_DE_MESA: get_fallback_imp_vinhos,
+    TipoImportacaoEnum.ESPUMANTES: get_fallback_imp_espumantes,
+    TipoImportacaoEnum.UVAS_FRESCAS: get_fallback_imp_frescas,
+    TipoImportacaoEnum.UVAS_PASSAS: get_fallback_imp_passas,
+    TipoImportacaoEnum.SUCO_DE_UVA: get_fallback_imp_suco,
 }
 
-@router.get("/importacao/{ano}")
-def get_importacao(ano: int, tipo: str = Query(..., description=VINHOS_DE_MESA + " | " + ESPUMANTES + " | " + UVAS_FRESCAS + " | " + UVAS_PASSAS + " | " + SUCO_DE_UVA)):
+@router.get("/importacao/{ano}", response_model=ImportacaoResponse)
+def get_importacao(
+        ano: int = Path(..., description="Ano para o qual os dados de importação devem ser retornados", ge=1970, le=2024),
+        tipo: TipoImportacaoEnum = Query(..., description="Categoria de uvas importadas")
+    ):
+    """
+    Retorna os dados de importação de uvas para o ano e tipo especificado.
+
+    Se não for possível obter os dados online, dados de fallback são utilizados.
+    """
     url = url_importacao(ano, tipo)
     try:
         tabela = get_html_table(url)
@@ -41,6 +51,6 @@ def get_importacao(ano: int, tipo: str = Query(..., description=VINHOS_DE_MESA +
 def url_importacao(ano: int, tipo: str) -> str:
     subopcao = TIPOS_IMPORTACAO.get(tipo.lower())
     if not subopcao:
-        raise ValueError("Tipo inválido. Use: " + VINHOS_DE_MESA + ", " + ESPUMANTES + ", " + UVAS_FRESCAS + ", " + UVAS_PASSAS + " ou " + SUCO_DE_UVA)
+        raise ValueError("Tipo inválido. Use: " + TipoImportacaoEnum.VINHOS_DE_MESA + ", " + TipoImportacaoEnum.ESPUMANTES + ", " + TipoImportacaoEnum.UVAS_FRESCAS + ", " + TipoImportacaoEnum.UVAS_PASSAS + " ou " + TipoImportacaoEnum.SUCO_DE_UVA)
     
     return f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_05&subopcao={subopcao}"

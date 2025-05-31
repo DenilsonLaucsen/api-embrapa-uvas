@@ -1,11 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from app.services.scraper import get_html_table, parse_producao_html
 from app.services.fallback import get_fallback_producao
+from app.models.producao import ProducaoResponse
 
 router = APIRouter()
 
-@router.get("/producao/{ano}")
-def get_producao(ano: int):
+@router.get("/producao/{ano}", response_model=ProducaoResponse)
+def get_producao(
+    ano: int = Path(..., description="Ano para o qual os dados de produção devem ser retornados", ge=1970, le=2023)
+):
+    """
+    Retorna os dados de produção do ano fornecido.
+
+    Se ocorrer uma falha ao acessar os dados online, um fallback será utilizado.
+    """
     url = url_producao(ano)
     try:
         tabela = get_html_table(url)
