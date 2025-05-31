@@ -87,10 +87,6 @@ pytest
 
 ---
 
-### 📺 Demonstração em vídeo
-Confira a demonstração do projeto no link abaixo:
-
-
 ## 📊 Diagrama de Arquitetura
 
 Abaixo está uma visão geral de alto nível da arquitetura do projeto:
