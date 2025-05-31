@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
+from app.models.importacao import TipoImportacaoEnum
 
 client = TestClient(app)
 
 expected_data = {
-  "tipo": "espumantes",
   "dados": [
     {
       "paises": "Africa do Sul",
@@ -381,12 +381,12 @@ expected_data = {
 
 def test_get_importacao_fallback():
     ano = 2023
-    tipo = "espumantes"
+    tipo = TipoImportacaoEnum.ESPUMANTES
     fallback_result = expected_data
 
     with patch("app.routes.importacao.get_html_table", side_effect=Exception("Erro simulado")):
         
-        response = client.get(f"/importacao/{ano}?tipo={tipo}")
+        response = client.get(f"/importacao/{ano}?tipo={tipo.value}")
         assert response.status_code == 200
         json_data = response.json()
         assert json_data["fonte"] == "fallback"

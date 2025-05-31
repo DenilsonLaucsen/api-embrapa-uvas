@@ -43,10 +43,10 @@ def get_importacao(
     try:
         tabela = get_html_table(url)
         dados = parse_importacao_html(tabela, ano)
-        return {"tipo": tipo, "dados": dados, "fonte": "scraper"}
+        return {"dados": dados, "fonte": "scraper"}
     except Exception as e:
         dados = FALLBACK_FUNCS.get(tipo.lower(), lambda x: [{"erro": "tipo inválido para fallback"}])(ano)
-        return {"tipo": tipo, "dados": dados, "fonte": "fallback"}
+        return {"dados": dados, "fonte": "fallback"}
     
 def url_importacao(ano: int, tipo: str) -> str:
     subopcao = TIPOS_IMPORTACAO.get(tipo.lower())

@@ -40,10 +40,10 @@ def get_exportacao(
     try:
         tabela = get_html_table(url)
         dados = parse_exportacao_html(tabela, ano)
-        return {"tipo": tipo, "dados": dados, "fonte": "scraper"}
+        return {"dados": dados, "fonte": "scraper"}
     except Exception as e:
         dados = FALLBACK_FUNCS.get(tipo.lower(), lambda x: [{"erro": "tipo inválido para fallback"}])(ano)
-        return {"tipo": tipo, "dados": dados, "fonte": "fallback"}
+        return {"dados": dados, "fonte": "fallback"}
 
 def url_exportacao(ano: int, tipo: str) -> str:
     subopcao = TIPOS_EXPORTACAO.get(tipo.lower())

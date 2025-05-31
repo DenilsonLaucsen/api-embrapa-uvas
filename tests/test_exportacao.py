@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
+from app.models.exportacao import TipoExportacaoEnum
 
 client = TestClient(app)
 
@@ -2277,14 +2278,14 @@ expected_data = {
 
 def test_get_exportacao_exception_fallback():
     ano = 2023
-    tipo = "vinhos_de_mesa"
+    tipo = TipoExportacaoEnum.VINHOS_DE_MESA
     fallback_result = expected_data["dados_scraper"]
 
     with patch.dict("app.routes.exportacao.FALLBACK_FUNCS", {
-        "vinhos_de_mesa": lambda ano: fallback_result
+        TipoExportacaoEnum.VINHOS_DE_MESA: lambda ano: fallback_result
         }), patch("app.routes.exportacao.get_html_table", side_effect=Exception("Erro simulado")):
         
-        response = client.get(f"/exportacao/{ano}?tipo={tipo}")
+        response = client.get(f"/exportacao/{ano}?tipo={tipo.value}")
         assert response.status_code == 200
         json_data = response.json()
         assert json_data["fonte"] == "fallback"
@@ -2292,12 +2293,12 @@ def test_get_exportacao_exception_fallback():
 
 def test_get_exportacao_fallback():
     ano = 2023
-    tipo = "vinhos_de_mesa"
+    tipo = TipoExportacaoEnum.VINHOS_DE_MESA
     fallback_result = expected_data["dados_fallback"]
 
     with patch("app.routes.exportacao.get_html_table", side_effect=Exception("Erro simulado")):
         
-        response = client.get(f"/exportacao/{ano}?tipo={tipo}")
+        response = client.get(f"/exportacao/{ano}?tipo={tipo.value}")
         assert response.status_code == 200
         json_data = response.json()
         assert json_data["fonte"] == "fallback"
